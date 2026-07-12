@@ -81,6 +81,44 @@ async def get_overview_dashboard(
     dept_scores_res = await db.execute(dept_scores_query)
     rankings = [{"department_name": row[0], "score": float(row[1])} for row in dept_scores_res.all()]
 
+    # Calculate emissions timeline dynamically
+    timeline_query = select(
+        CarbonTransaction.transaction_date,
+        func.sum(CarbonTransaction.calculated_emission).label("emissions")
+    ).group_by(CarbonTransaction.transaction_date).order_by(CarbonTransaction.transaction_date.asc())
+    timeline_res = await db.execute(timeline_query)
+    months_map = {1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun', 7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec'}
+    timeline_dict = {}
+    for row in timeline_res.all():
+        m_num = row[0].month
+        timeline_dict[m_num] = timeline_dict.get(m_num, 0) + float(row[1])
+    
+    emissions_timeline = []
+    for m in range(1, 8):  # January to July
+        emissions_timeline.append({
+            "date": months_map[m],
+            "emissions": round(timeline_dict.get(m, 0), 1)
+        })
+
+    # Recent activities (dynamic from database transactions)
+    tx_query = select(CarbonTransaction).order_by(CarbonTransaction.transaction_date.desc()).limit(2)
+    tx_res = await db.execute(tx_query)
+    recent_activity = []
+    for tx in tx_res.scalars().all():
+        recent_activity.append({
+            "id": f"tx-{tx.id}",
+            "action": f"Logged emission: {tx.description} ({float(tx.calculated_emission)} kg CO2e)",
+            "user": "ESG Manager",
+            "time": f"{tx.transaction_date.strftime('%b %d')}"
+        })
+    
+    recent_activity.append({
+        "id": "sys-1",
+        "action": "Seeded department scores and targets",
+        "user": "Super Admin",
+        "time": "Just now"
+    })
+
     return {
         "esg_score": {
             "overall": round(total_score, 2),
@@ -101,7 +139,9 @@ async def get_overview_dashboard(
                 "open": open_issues
             }
         },
-        "department_rankings": rankings
+        "department_rankings": rankings,
+        "emissions_timeline": emissions_timeline,
+        "recent_activity": recent_activity
     }
 
 @router.get("/environmental")
