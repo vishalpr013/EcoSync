@@ -9,10 +9,10 @@ export const Card = ({
   onClick,
   ...props
 }) => {
-  const baseStyle = 'rounded-2xl border border-slate-200/80 bg-white/95 p-5 transition-[transform,box-shadow,border-color] duration-300 shadow-[0_1px_2px_rgba(15,23,42,0.03),0_8px_24px_rgba(15,23,42,0.035)]';
-  const glassStyle = 'rounded-2xl border border-white/60 bg-white/75 backdrop-blur-xl dark:bg-slate-900/70 dark:border-slate-800/70 p-5 shadow-[0_16px_45px_rgba(15,23,42,0.08)]';
-  const darkClasses = glass ? '' : 'dark:bg-slate-950/80 dark:border-slate-800/80 dark:shadow-black/10';
-  const clickClasses = onClick ? 'cursor-pointer hover:-translate-y-0.5 hover:shadow-[0_16px_38px_rgba(15,23,42,0.09)] hover:border-emerald-300/70 dark:hover:border-emerald-800/80' : '';
+  const baseStyle = 'rounded-xl border border-gray-200/80 bg-white p-5 transition-all duration-200 shadow-sm';
+  const glassStyle = 'rounded-xl border border-white/20 bg-white/70 backdrop-blur-md dark:bg-gray-900/60 dark:border-gray-800/40 p-5 shadow-sm';
+  const darkClasses = glass ? '' : 'dark:bg-gray-950 dark:border-gray-800/60';
+  const clickClasses = onClick ? 'cursor-pointer hover:shadow-md hover:border-indigo-200 dark:hover:border-indigo-950' : '';
 
   return (
     <div
@@ -67,14 +67,14 @@ export const Table = ({
   className = '',
 }) => {
   return (
-    <div className={`overflow-x-auto w-full border border-slate-200/80 dark:border-slate-800 rounded-2xl bg-white/95 dark:bg-slate-950/80 shadow-[0_8px_28px_rgba(15,23,42,0.04)] ${className}`}>
+    <div className={`overflow-x-auto w-full border border-gray-200/80 dark:border-gray-800 rounded-xl bg-white dark:bg-gray-950 shadow-sm ${className}`}>
       <table className="w-full text-left border-collapse">
         <thead>
-          <tr className="bg-slate-50/90 dark:bg-slate-900/70 border-b border-slate-200/80 dark:border-slate-800">
+          <tr className="bg-gray-50/75 dark:bg-gray-900/50 border-b border-gray-200/80 dark:border-gray-800">
             {columns.map((col, idx) => (
               <th
                 key={idx}
-                className="px-5 py-3.5 text-[11px] font-bold text-slate-500 uppercase tracking-[0.12em] dark:text-slate-400"
+                className="px-5 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider dark:text-gray-400"
               >
                 {col.header}
               </th>
@@ -103,7 +103,7 @@ export const Table = ({
               <tr
                 key={rowIdx}
                 onClick={() => onRowClick && onRowClick(row)}
-                className={`transition-colors duration-200 hover:bg-emerald-50/35 dark:hover:bg-emerald-950/10 ${onRowClick ? 'cursor-pointer' : ''}`}
+                className={`transition-colors hover:bg-gray-50/50 dark:hover:bg-gray-900/20 ${onRowClick ? 'cursor-pointer' : ''}`}
               >
                 {columns.map((col, colIdx) => (
                   <td key={colIdx} className="px-5 py-3 text-sm text-gray-700 dark:text-gray-300">

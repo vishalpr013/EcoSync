@@ -227,18 +227,6 @@ async def update_settings(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(require_roles(UserRole.ADMIN)),
 ):
-    weight_keys = ("env_weight", "social_weight", "governance_weight")
-    if any(key in settings_data for key in weight_keys):
-        existing = {c.key: c.value for c in (await db.execute(select(ESGConfiguration))).scalars()}
-        merged = {key: settings_data.get(key, existing.get(key, 0)) for key in weight_keys}
-        try:
-            weights = {key: int(value) for key, value in merged.items()}
-        except (TypeError, ValueError):
-            from app.core.exceptions import BadRequestError
-            raise BadRequestError("ESG weights must be whole-number percentages")
-        if any(value < 0 or value > 100 for value in weights.values()) or sum(weights.values()) != 100:
-            from app.core.exceptions import BadRequestError
-            raise BadRequestError("Environmental, social, and governance weights must total 100")
     for key, value in settings_data.items():
         result = await db.execute(select(ESGConfiguration).where(ESGConfiguration.key == key))
         config = result.scalar_one_or_none()

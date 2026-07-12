@@ -1,9 +1,5 @@
 import api from './api';
 
-const compactParams = (params = {}) => Object.fromEntries(
-  Object.entries(params).filter(([, value]) => value !== '' && value !== null && value !== undefined)
-);
-
 export const dashboardService = {
   // Dashboards
   getOverviewDashboard: async () => {
@@ -54,20 +50,16 @@ export const dashboardService = {
   },
 
   // Reports
-  getReportOptions: async () => {
-    const response = await api.get('/reports/options');
-    return response.data;
-  },
   getEnvironmentalReport: async (params) => {
-    const response = await api.get('/reports/environmental', { params: compactParams(params) });
+    const response = await api.get('/reports/environmental', { params });
     return response.data;
   },
   getSocialReport: async (params) => {
-    const response = await api.get('/reports/social', { params: compactParams(params) });
+    const response = await api.get('/reports/social', { params });
     return response.data;
   },
   getGovernanceReport: async (params) => {
-    const response = await api.get('/reports/governance', { params: compactParams(params) });
+    const response = await api.get('/reports/governance', { params });
     return response.data;
   },
   getExecutiveSummaryReport: async () => {

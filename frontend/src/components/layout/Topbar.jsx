@@ -32,13 +32,13 @@ const Topbar = ({ collapsed, toggleSidebar }) => {
   if (!user) return null;
 
   return (
-    <header className={`fixed top-0 right-0 left-0 z-30 h-[4.5rem] bg-white/80 border-b border-slate-200/70 backdrop-blur-xl dark:bg-[#0b1115]/80 dark:border-white/[0.06] transition-[left] duration-300 flex items-center justify-between px-4 sm:px-6
-      ${collapsed ? 'lg:left-[4.5rem]' : 'lg:left-[15.5rem]'}`}>
+    <header className={`fixed top-0 right-0 z-30 h-16 bg-white border-b border-gray-200/80 dark:bg-[#16171d] dark:border-gray-800 transition-all duration-200 flex items-center justify-between px-6
+      ${collapsed ? 'left-16' : 'left-64'}`}>
       
       {/* Sidebar toggle */}
       <button 
         onClick={toggleSidebar}
-        className="p-2 rounded-xl text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors"
+        className="p-1.5 rounded-lg text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
       >
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={collapsed ? "M4 6h16M4 12h16M4 18h16" : "M4 6h16M4 12h10M4 18h16"} />
@@ -46,11 +46,11 @@ const Topbar = ({ collapsed, toggleSidebar }) => {
       </button>
 
       {/* Actions */}
-      <div className="flex items-center gap-1.5 sm:gap-2">
+      <div className="flex items-center gap-4">
         {/* Theme Toggle */}
         <button
           onClick={toggleTheme}
-          className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-900 transition-colors"
+          className="p-2 rounded-lg text-gray-500 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-900 transition-colors"
           title="Toggle color theme"
         >
           {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
@@ -60,11 +60,11 @@ const Topbar = ({ collapsed, toggleSidebar }) => {
         <div className="relative" ref={notifRef}>
           <button
             onClick={() => setNotifOpen(!notifOpen)}
-            className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-900 transition-colors relative"
+            className="p-2 rounded-lg text-gray-500 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-900 transition-colors relative"
           >
             <Bell className="w-5 h-5" />
             {unreadCount > 0 && (
-              <span className="absolute top-2 right-2 w-2 h-2 bg-emerald-500 rounded-full ring-2 ring-white dark:ring-[#0b1115] animate-pulse" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white dark:ring-[#16171d]" />
             )}
           </button>
 
@@ -117,7 +117,7 @@ const Topbar = ({ collapsed, toggleSidebar }) => {
         <div className="relative" ref={userRef}>
           <button
             onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-            className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors"
+            className="flex items-center gap-2 p-1 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
           >
             <img
               src={user.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=${user.first_name}`}

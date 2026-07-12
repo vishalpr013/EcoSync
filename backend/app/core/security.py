@@ -6,12 +6,15 @@ from typing import Optional
 from enum import Enum
 from functools import wraps
 
-import bcrypt
 import jwt
+from passlib.context import CryptContext
 from fastapi import HTTPException, status, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from app.core.config import settings
+
+# Password hashing
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # JWT Bearer scheme
 security_scheme = HTTPBearer()
@@ -26,17 +29,11 @@ class UserRole(str, Enum):
 
 
 def hash_password(password: str) -> str:
-    encoded = password.encode("utf-8")
-    if len(encoded) > 72:
-        raise ValueError("Password must be at most 72 UTF-8 bytes")
-    return bcrypt.hashpw(encoded, bcrypt.gensalt()).decode("utf-8")
+    return pwd_context.hash(password)
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    try:
-        return bcrypt.checkpw(plain_password.encode("utf-8"), hashed_password.encode("utf-8"))
-    except (ValueError, TypeError):
-        return False
+    return pwd_context.verify(plain_password, hashed_password)
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
