@@ -194,51 +194,51 @@ const DashboardPage = () => {
             </p>
           </div>
           <Badge color="indigo" className="py-1 px-3">
-            Active Weights: Env {data.esg_score.weights.environmental}%, Soc {data.esg_score.weights.social}%, Gov {data.esg_score.weights.governance}%
+            Active Weights: Env {data.esg_score?.weights?.environmental ?? 40}%, Soc {data.esg_score?.weights?.social ?? 30}%, Gov {data.esg_score?.weights?.governance ?? 30}%
           </Badge>
         </div>
 
         {/* Score Cards Row */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
-          <Card className="flex items-center justify-around h-36">
-            <ESGScoreGauge score={data.esg_score.overall} title="Overall ESG Score" color="#6366f1" />
+          <Card className="flex items-center justify-around h-40">
+            <ESGScoreGauge score={data.esg_score?.overall ?? 0} title="Overall ESG Score" color="#6366f1" />
           </Card>
           
-          <Card className="flex flex-col justify-between h-36">
+          <Card className="flex flex-col justify-between h-40">
             <div className="flex items-start justify-between">
               <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Environmental</span>
               <Leaf className="w-5 h-5 text-green-500" />
             </div>
             <div>
-              <span className="text-3xl font-extrabold text-gray-900 dark:text-white">{data.esg_score.environmental}</span>
+              <span className="text-3xl font-extrabold text-gray-900 dark:text-white">{data.esg_score?.environmental ?? 0}</span>
               <p className="text-[11px] text-gray-500 mt-1 flex items-center gap-1">
                 <TrendingDown className="w-3.5 h-3.5 text-green-500" /> Carbon footprint decreasing
               </p>
             </div>
           </Card>
 
-          <Card className="flex flex-col justify-between h-36">
+          <Card className="flex flex-col justify-between h-40">
             <div className="flex items-start justify-between">
               <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Social Impact</span>
               <Users className="w-5 h-5 text-indigo-500" />
             </div>
             <div>
-              <span className="text-3xl font-extrabold text-gray-900 dark:text-white">{data.esg_score.social}</span>
+              <span className="text-3xl font-extrabold text-gray-900 dark:text-white">{data.esg_score?.social ?? 0}</span>
               <p className="text-[11px] text-gray-500 mt-1">
-                Active CSR participation: {data.metrics.total_csr_participations} employees
+                Active CSR participation: {data.metrics?.total_csr_participations ?? 0} employees
               </p>
             </div>
           </Card>
 
-          <Card className="flex flex-col justify-between h-36">
+          <Card className="flex flex-col justify-between h-40">
             <div className="flex items-start justify-between">
               <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Governance</span>
               <ShieldCheck className="w-5 h-5 text-amber-500" />
             </div>
             <div>
-              <span className="text-3xl font-extrabold text-gray-900 dark:text-white">{data.esg_score.governance}</span>
+              <span className="text-3xl font-extrabold text-gray-900 dark:text-white">{data.esg_score?.governance ?? 0}</span>
               <p className="text-[11px] text-gray-500 mt-1 text-red-500 font-medium flex items-center gap-1">
-                <AlertTriangle className="w-3.5 h-3.5" /> {data.metrics.compliance_issues.open} open compliance issue(s)
+                <AlertTriangle className="w-3.5 h-3.5" /> {data.metrics?.compliance_issues?.open ?? 0} open compliance issue(s)
               </p>
             </div>
           </Card>
@@ -250,14 +250,14 @@ const DashboardPage = () => {
             <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
               <Leaf className="w-4 h-4 text-green-500" /> Monthly Carbon Footprint (kg CO₂e)
             </h3>
-            <EmissionsChart data={data.emissions_timeline} height={260} />
+            <EmissionsChart data={data.emissions_timeline || []} height={260} />
           </Card>
 
           <Card>
             <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
               <Award className="w-4 h-4 text-indigo-500" /> Department ESG Rankings
             </h3>
-            <DeptRanking data={data.department_rankings} height={260} />
+            <DeptRanking data={data.department_rankings || []} height={260} />
           </Card>
         </div>
 
@@ -268,7 +268,7 @@ const DashboardPage = () => {
               <History className="w-4 h-4 text-gray-400" /> Recent Organization Activity
             </h3>
             <div className="space-y-4">
-              {data.recent_activity.map((activity) => (
+              {(data.recent_activity || []).map((activity) => (
                 <div key={activity.id} className="flex justify-between items-start text-xs pb-3 border-b border-gray-100 dark:border-gray-850 last:border-0 last:pb-0">
                   <div className="flex flex-col gap-0.5">
                     <p className="font-semibold text-gray-800 dark:text-gray-200">{activity.action}</p>
@@ -324,38 +324,38 @@ const DashboardPage = () => {
 
         {/* Score Row */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
-          <Card className="flex items-center justify-around h-36">
-            <ESGScoreGauge score={data.esg_score.overall} title="Dept Score" color="#10b981" />
+          <Card className="flex items-center justify-around h-40">
+            <ESGScoreGauge score={data.esg_score?.overall ?? 0} title="Dept Score" color="#10b981" />
           </Card>
-          <Card className="flex flex-col justify-between h-36">
+          <Card className="flex flex-col justify-between h-40">
             <div className="flex items-start justify-between">
               <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Emissions</span>
               <Leaf className="w-5 h-5 text-green-500" />
             </div>
             <div>
               <span className="text-3xl font-extrabold text-gray-900 dark:text-white">
-                {formatNumber(data.metrics.carbon_emissions, 1)} kg
+                {formatNumber(data.metrics?.carbon_emissions ?? 0, 1)} kg
               </span>
               <p className="text-[11px] text-gray-500 mt-1">This month's carbon footprint</p>
             </div>
           </Card>
-          <Card className="flex flex-col justify-between h-36">
+          <Card className="flex flex-col justify-between h-40">
             <div className="flex items-start justify-between">
               <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">CSR Involvement</span>
               <Users className="w-5 h-5 text-indigo-500" />
             </div>
             <div>
-              <span className="text-3xl font-extrabold text-gray-900 dark:text-white">{data.metrics.csr_participations}</span>
+              <span className="text-3xl font-extrabold text-gray-900 dark:text-white">{data.metrics?.csr_participations ?? 0}</span>
               <p className="text-[11px] text-gray-500 mt-1">Total participant completions</p>
             </div>
           </Card>
-          <Card className="flex flex-col justify-between h-36">
+          <Card className="flex flex-col justify-between h-40">
             <div className="flex items-start justify-between">
               <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Compliance</span>
               <ShieldCheck className="w-5 h-5 text-amber-500" />
             </div>
             <div>
-              <span className="text-3xl font-extrabold text-gray-900 dark:text-white">{data.metrics.open_issues}</span>
+              <span className="text-3xl font-extrabold text-gray-900 dark:text-white">{data.metrics?.open_issues ?? 0}</span>
               <p className="text-[11px] text-gray-500 mt-1 text-red-500 font-semibold">Active warning issues</p>
             </div>
           </Card>
@@ -364,12 +364,12 @@ const DashboardPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
           <Card className="lg:col-span-2">
             <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200 mb-4">Department Carbon Trend</h3>
-            <EmissionsChart data={data.emissions_timeline} height={240} />
+            <EmissionsChart data={data.emissions_timeline || []} height={240} />
           </Card>
           <Card>
             <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200 mb-4">Top Team Members</h3>
             <div className="space-y-4">
-              {data.team_members.map((m, idx) => (
+              {(data.team_members || []).map((m, idx) => (
                 <div key={idx} className="flex justify-between items-center text-xs pb-3 border-b last:border-0 last:pb-0 dark:border-gray-800">
                   <div className="flex items-center gap-2.5">
                     <span className="font-extrabold text-gray-400 w-4">#{idx+1}</span>
@@ -406,7 +406,7 @@ const DashboardPage = () => {
             </p>
           </div>
           <div className="text-center bg-white/10 p-3 rounded-lg backdrop-blur-sm min-w-28 shrink-0">
-            <span className="block text-2xl font-black">{data.employee.xp_points}</span>
+            <span className="block text-2xl font-black">{data.employee?.xp_points ?? 0}</span>
             <span className="text-[9px] font-bold text-indigo-200 uppercase tracking-widest">My XP Balance</span>
           </div>
         </div>
@@ -419,11 +419,11 @@ const DashboardPage = () => {
               <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
                 <Award className="w-4.5 h-4.5 text-indigo-500" /> Active Sustainability Challenges
               </h3>
-              {data.challenges.length === 0 ? (
+              {(data.challenges || []).length === 0 ? (
                 <p className="text-xs text-gray-400 text-center py-6">No active challenges available to join</p>
               ) : (
                 <div className="space-y-3.5">
-                  {data.challenges.map((c) => (
+                  {(data.challenges || []).map((c) => (
                     <div key={c.id} className="flex justify-between items-center border border-gray-100 dark:border-gray-850 p-3.5 rounded-lg">
                       <div>
                         <h4 className="text-xs font-bold text-gray-800 dark:text-gray-200">{c.title}</h4>
@@ -447,7 +447,7 @@ const DashboardPage = () => {
                 <Sparkles className="w-4.5 h-4.5 text-amber-500" /> Rewards Catalog
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {data.rewards.map((r) => (
+                {(data.rewards || []).map((r) => (
                   <div key={r.id} className="border border-gray-150 dark:border-gray-850 rounded-lg p-3 flex flex-col justify-between h-40">
                     <div>
                       <h4 className="text-xs font-extrabold text-gray-800 dark:text-gray-200">{r.name}</h4>
@@ -457,7 +457,7 @@ const DashboardPage = () => {
                       <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400">{r.points_required} XP</span>
                       <Button
                         size="sm"
-                        variant={data.employee.xp_points >= r.points_required ? 'primary' : 'outline'}
+                        variant={(data.employee?.xp_points ?? 0) >= r.points_required ? 'primary' : 'outline'}
                         className="text-[10px] py-1 px-2.5"
                         onClick={() => handleRedeem(r.id, r.points_required)}
                       >
@@ -472,9 +472,9 @@ const DashboardPage = () => {
 
           {/* Right Column: Badges */}
           <Card className="h-fit">
-            <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200 mb-4">My Badges ({data.employee.badges_count})</h3>
+            <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200 mb-4">My Badges ({data.employee?.badges_count ?? 0})</h3>
             <div className="space-y-4">
-              {data.badges.map((b) => (
+              {(data.badges || []).map((b) => (
                 <div key={b.id} className="flex items-start gap-3 p-2.5 rounded-lg bg-gray-50/60 dark:bg-gray-900/10">
                   <div className="w-9 h-9 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40 flex items-center justify-center shrink-0">
                     <Award className="w-5 h-5 text-amber-600 dark:text-amber-400" />
@@ -511,19 +511,19 @@ const DashboardPage = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
           <Card className="flex flex-col justify-between h-28">
             <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Total Audits</span>
-            <span className="text-3xl font-extrabold text-gray-900 dark:text-white">{data.metrics.total_audits}</span>
+            <span className="text-3xl font-extrabold text-gray-900 dark:text-white">{data.metrics?.total_audits ?? 0}</span>
           </Card>
           <Card className="flex flex-col justify-between h-28">
             <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">In Progress</span>
-            <span className="text-3xl font-extrabold text-indigo-650 dark:text-indigo-400">{data.metrics.in_progress}</span>
+            <span className="text-3xl font-extrabold text-indigo-650 dark:text-indigo-400">{data.metrics?.in_progress ?? 0}</span>
           </Card>
           <Card className="flex flex-col justify-between h-28">
             <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Planned</span>
-            <span className="text-3xl font-extrabold text-amber-500">{data.metrics.planned}</span>
+            <span className="text-3xl font-extrabold text-amber-500">{data.metrics?.planned ?? 0}</span>
           </Card>
           <Card className="flex flex-col justify-between h-28">
             <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Open Issues</span>
-            <span className="text-3xl font-extrabold text-red-500">{data.issues.length}</span>
+            <span className="text-3xl font-extrabold text-red-500">{(data.issues || []).length}</span>
           </Card>
         </div>
 
@@ -538,7 +538,7 @@ const DashboardPage = () => {
                 { header: 'Score', key: 'score', render: (row) => row.score ? <Badge color="green">{row.score}</Badge> : '-' },
                 { header: 'Status', key: 'status', render: (row) => <StatusBadge status={row.status} /> }
               ]}
-              data={data.audits}
+              data={data.audits || []}
             />
           </Card>
 
@@ -551,7 +551,7 @@ const DashboardPage = () => {
                 { header: 'Due Date', key: 'due_date', render: (row) => <span className="text-xs font-medium text-red-500">{row.due_date}</span> },
                 { header: 'Status', key: 'status', render: (row) => <StatusBadge status={row.status} /> }
               ]}
-              data={data.issues}
+              data={data.issues || []}
             />
           </Card>
         </div>

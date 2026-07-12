@@ -138,7 +138,7 @@ async def send_chat_message(
                 from google import genai
                 client = genai.Client(api_key=api_key)
                 stream = client.models.generate_content_stream(
-                    model="gemini-2.5-flash",
+                    model=settings.GEMINI_MODEL,
                     contents=message,
                     config={
                         "system_instruction": (
@@ -153,9 +153,24 @@ async def send_chat_message(
                         yield chunk.text
                         full_reply_chunks.append(chunk.text)
             except Exception as e:
-                err_msg = f"EcoSync AI was unable to reach Gemini API: *{str(e)}*\n\nLocal Response to your query: '{message}'"
-                yield err_msg
-                full_reply_chunks.append(err_msg)
+                # Graceful user-friendly fallback to Demo Mode
+                fallback_msg = (
+                    "ℹ️ *Live Gemini API limit exceeded (429 Quota Exhausted) or connection error. "
+                    "Displaying local EcoSync AI consultant recommendations instead:*\n\n"
+                )
+                yield fallback_msg
+                full_reply_chunks.append(fallback_msg)
+                
+                mock_chunks = [
+                    "Hello! I am your **EcoSync AI Copilot**.\n\n",
+                    f"Regarding your query *\"{message}\"*, here are my ESG recommendations:\n\n",
+                    "1. **Environmental**: Verify carbon transactional entries against Scope 2 electricity factors to ensure accurate footprint tracking.\n",
+                    "2. **Social**: Enforce mandatory evidence/receipt uploads before approving employee CSR community activities.\n",
+                    "3. **Governance**: Regularly audit open compliance issues and set clear owners with due dates before warnings become overdue."
+                ]
+                for chunk in mock_chunks:
+                    yield chunk
+                    full_reply_chunks.append(chunk)
 
         # Store AI response in local conversation log after generator is completed
         if conv_id_str:
