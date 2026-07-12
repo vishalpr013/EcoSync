@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     API_PREFIX: str = "/api/v1"
 
     # Database
-    DATABASE_URL: str = "sqlite+aiosqlite:///./ecosync.db"
+    DATABASE_URL: str = "postgresql+asyncpg://ecosync:ecosync@localhost:5432/ecosync"
 
     # JWT
     JWT_SECRET_KEY: str = "your-super-secret-key-change-in-production"
@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     JWT_REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
     # CORS
-    CORS_ORIGINS: str = "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000"
+    CORS_ORIGINS: str = "http://localhost:5173,http://localhost:3000"
 
     # File Upload
     UPLOAD_DIR: str = "uploads"

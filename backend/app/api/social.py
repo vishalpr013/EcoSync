@@ -11,8 +11,7 @@ from app.api.deps import get_current_user, require_roles
 from app.core.security import UserRole
 from app.core.exceptions import NotFoundError, EvidenceRequiredError, BadRequestError
 from app.models.social import CSRActivity, EmployeeParticipation, DiversityMetric, Training, ApprovalStatus
-from app.models.core import User, ESGConfiguration, NotificationType
-from app.services.notifications import notify_user
+from app.models.core import User, ESGConfiguration
 from app.schemas.common import PaginatedResponse, MessageResponse, IDResponse
 from app.repositories.base import BaseRepository
 
@@ -153,11 +152,6 @@ async def approve_participation(
 
     participation.approval_status = new_status
     participation.approved_by = current_user.id
-    await notify_user(
-        db, participation.employee_id, "CSR participation reviewed",
-        f"Your CSR participation was {new_status}.",
-        NotificationType.CSR_APPROVAL, "/social",
-    )
     await db.flush()
 
     return MessageResponse(message=f"Participation {new_status}")

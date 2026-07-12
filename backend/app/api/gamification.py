@@ -15,33 +15,11 @@ from app.core.exceptions import NotFoundError, InsufficientXPError, OutOfStockEr
 from app.models.gamification import (
     Challenge, ChallengeParticipation, Badge, UserBadge, Reward, RewardRedemption,
 )
-from app.models.core import User, ESGConfiguration, NotificationType
-from app.models.gamification import ChallengeStatus
-from app.core.exceptions import BadRequestError, EvidenceRequiredError
-from app.services.notifications import notify_user
+from app.models.core import User, ESGConfiguration
 from app.schemas.common import PaginatedResponse, MessageResponse, IDResponse
 from app.repositories.base import BaseRepository
 
 router = APIRouter()
-
-
-def validate_challenge_transition(current_status, requested_status) -> ChallengeStatus:
-    """Validate the official Draft -> Active -> Review -> Completed lifecycle."""
-    try:
-        current = ChallengeStatus(current_status)
-        target = ChallengeStatus(requested_status)
-    except (TypeError, ValueError):
-        raise BadRequestError("A valid challenge status is required")
-    allowed = {
-        ChallengeStatus.DRAFT: {ChallengeStatus.ACTIVE, ChallengeStatus.ARCHIVED},
-        ChallengeStatus.ACTIVE: {ChallengeStatus.UNDER_REVIEW, ChallengeStatus.ARCHIVED},
-        ChallengeStatus.UNDER_REVIEW: {ChallengeStatus.COMPLETED, ChallengeStatus.ACTIVE, ChallengeStatus.ARCHIVED},
-        ChallengeStatus.COMPLETED: {ChallengeStatus.ARCHIVED},
-        ChallengeStatus.ARCHIVED: set(),
-    }
-    if target not in allowed[current]:
-        raise BadRequestError(f"Invalid challenge transition: {current.value} -> {target.value}")
-    return target
 
 
 # ──────────────── Challenges ────────────────
@@ -98,13 +76,10 @@ async def change_challenge_status(
     current_user: User = Depends(require_roles(UserRole.ADMIN, UserRole.ESG_MANAGER)),
 ):
     repo = BaseRepository(Challenge, db)
-    challenge = await repo.get_by_id(challenge_id)
+    challenge = await repo.update(challenge_id, status=data.get("status"))
     if not challenge:
         raise NotFoundError("Challenge", str(challenge_id))
-    target = validate_challenge_transition(challenge.status, data.get("status"))
-    challenge.status = target
-    await db.flush()
-    return MessageResponse(message=f"Challenge status updated to {target.value}")
+    return MessageResponse(message=f"Challenge status updated to {data.get('status')}")
 
 
 # ──────────────── Challenge Participation ────────────────
@@ -119,16 +94,6 @@ async def join_challenge(
     challenge = await challenge_repo.get_by_id(challenge_id)
     if not challenge:
         raise NotFoundError("Challenge", str(challenge_id))
-    if challenge.status != ChallengeStatus.ACTIVE:
-        raise BadRequestError("Only active challenges can be joined")
-    existing = await db.execute(
-        select(ChallengeParticipation).where(
-            ChallengeParticipation.challenge_id == challenge_id,
-            ChallengeParticipation.employee_id == current_user.id,
-        )
-    )
-    if existing.scalar_one_or_none():
-        raise BadRequestError("You already joined this challenge")
 
     repo = BaseRepository(ChallengeParticipation, db)
     participation = await repo.create(
@@ -151,10 +116,6 @@ async def approve_challenge_participation(
         raise NotFoundError("Challenge Participation", str(cp_id))
 
     new_status = data.get("approval_status", "approved")
-    if new_status not in {"approved", "rejected"}:
-        raise BadRequestError("approval_status must be approved or rejected")
-    if cp.approval_status.value != "pending":
-        raise BadRequestError("This participation has already been reviewed")
     cp.approval_status = new_status
     cp.approved_by = current_user.id
 
@@ -163,8 +124,6 @@ async def approve_challenge_participation(
         challenge_repo = BaseRepository(Challenge, db)
         challenge = await challenge_repo.get_by_id(cp.challenge_id)
         if challenge:
-            if challenge.evidence_required and not cp.proof_url:
-                raise EvidenceRequiredError()
             cp.xp_awarded = challenge.xp_reward
             cp.completed_at = datetime.now(timezone.utc)
 
@@ -176,12 +135,6 @@ async def approve_challenge_participation(
 
                 # Check badge auto-award
                 await _check_badge_auto_award(db, user)
-
-                await notify_user(
-                    db, user.id, "Challenge approved",
-                    f"Your challenge submission earned {challenge.xp_reward} XP.",
-                    NotificationType.CHALLENGE_UPDATE, "/gamification",
-                )
 
     await db.flush()
     return MessageResponse(message=f"Challenge participation {new_status}")
@@ -229,11 +182,6 @@ async def _check_badge_auto_award(db: AsyncSession, user: User):
                 badge_id=badge.id,
                 awarded_at=datetime.now(timezone.utc),
             ))
-            await notify_user(
-                db, user.id, "Badge unlocked",
-                f"You unlocked the {badge.name} badge.",
-                NotificationType.BADGE_UNLOCK, "/gamification",
-            )
 
 
 # ──────────────── Badges ────────────────
@@ -324,11 +272,6 @@ async def redeem_reward(
         reward_id=reward_id,
         employee_id=current_user.id,
         points_spent=reward.points_required,
-    )
-    await notify_user(
-        db, current_user.id, "Reward redeemed",
-        f"{reward.name} was redeemed for {reward.points_required} XP.",
-        NotificationType.REWARD_REDEEMED, "/gamification",
     )
     await db.flush()
 

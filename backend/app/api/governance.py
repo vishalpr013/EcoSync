@@ -12,8 +12,7 @@ from app.api.deps import get_current_user, require_roles
 from app.core.security import UserRole
 from app.core.exceptions import NotFoundError
 from app.models.governance import ESGPolicy, PolicyAcknowledgement, Audit, ComplianceIssue
-from app.models.core import User, NotificationType
-from app.services.notifications import notify_user
+from app.models.core import User
 from app.schemas.common import PaginatedResponse, MessageResponse, IDResponse
 from app.repositories.base import BaseRepository
 
@@ -208,11 +207,6 @@ async def create_compliance_issue(
     data["created_by"] = current_user.id
     repo = BaseRepository(ComplianceIssue, db)
     issue = await repo.create(**data)
-    await notify_user(
-        db, issue.owner_id, "New compliance issue assigned",
-        f"{issue.title} is due on {issue.due_date}.",
-        NotificationType.COMPLIANCE_ISSUE, "/governance",
-    )
     return IDResponse(id=issue.id, message="Compliance issue raised")
 
 
