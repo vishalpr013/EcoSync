@@ -1,26 +1,33 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { dashboardService } from '../services/dashboardService';
 import { Card, Table, Badge } from '../components/ui/DataDisplay';
 import { Button, Select, Input } from '../components/ui/FormControls';
 import { Loader } from '../components/ui/Overlays';
 import { EmissionsChart } from '../components/ui/Charts';
-import { FileText, Download, Filter, Eye, BarChart2 } from 'lucide-react';
-import { formatDate } from '../utils/helpers';
+import { FileText, Download, Filter, Eye, BarChart2, SlidersHorizontal } from 'lucide-react';
 
 const ReportsPage = () => {
   const [reportType, setReportType] = useState('environmental'); // environmental | social | governance | executive | custom
   const [loading, setLoading] = useState(false);
   const [previewData, setPreviewData] = useState(null);
+  const [departmentOptions, setDepartmentOptions] = useState([{ label: 'All Departments', value: '' }]);
   
   // Custom filter states
-  const [filters, setFilters] = useState({ department_id: '', start_date: '', end_date: '', category: '' });
+  const [filters, setFilters] = useState({ department_id: '', start_date: '', end_date: '', module: 'environmental', employee: '', challenge: '', category: '' });
 
   const templates = [
     { type: 'environmental', title: 'Environmental Report', desc: 'Scope 1, 2, and 3 carbon emissions data logs.' },
     { type: 'social', title: 'Social Impact Report', desc: 'Employee CSR campaign involvements and diversity audits.' },
     { type: 'governance', title: 'Governance & Compliance', desc: 'Active policies signages and audit safety scoring logs.' },
-    { type: 'executive', title: 'Executive Summary', desc: 'High-level ESG score weighting and progress charts.' }
+    { type: 'executive', title: 'Executive Summary', desc: 'High-level ESG score weighting and progress charts.' },
+    { type: 'custom', title: 'Custom Report Builder', desc: 'Combine module, people, challenge, category, and date filters.' }
   ];
+
+  useEffect(() => {
+    dashboardService.getReportOptions()
+      .then((data) => setDepartmentOptions([{ label: 'All Departments', value: '' }, ...(data.departments || [])]))
+      .catch(() => {});
+  }, []);
 
   const handleGeneratePreview = async () => {
     setLoading(true);
@@ -126,7 +133,7 @@ const ReportsPage = () => {
       </div>
 
       {/* Select template */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
         {templates.map((t) => (
           <Card
             key={t.type}
@@ -141,7 +148,7 @@ const ReportsPage = () => {
               }`}
           >
             <div className="flex flex-col gap-1.5">
-              <FileText className="w-5 h-5 text-indigo-500" />
+              {t.type === 'custom' ? <SlidersHorizontal className="w-5 h-5 text-emerald-500" /> : <FileText className="w-5 h-5 text-indigo-500" />}
               <h4 className="text-xs font-bold text-gray-850 dark:text-gray-250">{t.title}</h4>
               <p className="text-[10px] text-gray-400 leading-normal">{t.desc}</p>
             </div>
@@ -155,15 +162,10 @@ const ReportsPage = () => {
           <Filter className="w-4 h-4" />
           <span className="text-xs font-bold uppercase tracking-wider">Report Builder Filters</span>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
           <Select
             label="Department"
-            options={[
-              { label: 'All Departments', value: 'all' },
-              { label: 'Manufacturing', value: 'mfg' },
-              { label: 'Logistics', value: 'log' },
-              { label: 'Corporate Office', value: 'corp' }
-            ]}
+            options={departmentOptions}
             value={filters.department_id}
             onChange={(e) => setFilters(prev => ({ ...prev, department_id: e.target.value }))}
           />
@@ -173,6 +175,21 @@ const ReportsPage = () => {
             value={filters.start_date}
             onChange={(e) => setFilters(prev => ({ ...prev, start_date: e.target.value }))}
           />
+          {reportType === 'custom' && (
+            <>
+              <Select label="Module" options={[
+                { label: 'Environmental', value: 'environmental' },
+                { label: 'Social', value: 'social' },
+                { label: 'Governance', value: 'governance' },
+              ]} value={filters.module} onChange={(e) => setFilters(prev => ({ ...prev, module: e.target.value }))} />
+              <Input label="Employee" placeholder="Name or employee ID" value={filters.employee}
+                onChange={(e) => setFilters(prev => ({ ...prev, employee: e.target.value }))} />
+              <Input label="Challenge" placeholder="Challenge title or ID" value={filters.challenge}
+                onChange={(e) => setFilters(prev => ({ ...prev, challenge: e.target.value }))} />
+              <Input label="ESG Category" placeholder="Category" value={filters.category}
+                onChange={(e) => setFilters(prev => ({ ...prev, category: e.target.value }))} />
+            </>
+          )}
           <Input
             label="To Date"
             type="date"

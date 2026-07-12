@@ -12,13 +12,13 @@ export const Button = ({
   onClick,
   ...props
 }) => {
-  const baseStyle = 'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
+  const baseStyle = 'inline-flex items-center justify-center font-semibold rounded-xl transition-[transform,background-color,border-color,box-shadow] duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]';
   
   const variants = {
-    primary: 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm focus:ring-indigo-500 border border-transparent',
+    primary: 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-[0_8px_18px_rgba(5,150,105,0.18)] hover:shadow-[0_10px_24px_rgba(5,150,105,0.24)] focus:ring-emerald-500 border border-transparent',
     secondary: 'bg-gray-100 hover:bg-gray-200 text-gray-900 border border-transparent dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700',
     danger: 'bg-red-600 hover:bg-red-700 text-white shadow-sm focus:ring-red-500 border border-transparent',
-    outline: 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800',
+    outline: 'border border-slate-300 bg-white text-slate-700 hover:border-emerald-300 hover:bg-emerald-50/40 focus:ring-emerald-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800',
     ghost: 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800',
   };
 
@@ -62,10 +62,10 @@ export const Input = React.forwardRef(({
         id={id}
         type={type}
         ref={ref}
-        className={`w-full px-3.5 py-2 text-sm bg-white dark:bg-gray-950 border rounded-lg shadow-inner outline-none transition-all duration-150
+        className={`w-full px-3.5 py-2.5 text-sm bg-white/90 dark:bg-slate-950/80 border rounded-xl outline-none transition-all duration-200 placeholder:text-slate-400
           ${error 
             ? 'border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-200 dark:focus:ring-red-900/30' 
-            : 'border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:border-gray-800 dark:focus:border-indigo-500 dark:focus:ring-indigo-950/30'
+            : 'border-slate-200 hover:border-slate-300 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100/70 dark:border-slate-800 dark:focus:border-emerald-500 dark:focus:ring-emerald-950/30'
           } dark:text-gray-100`}
         {...props}
       />
@@ -96,10 +96,10 @@ export const Select = React.forwardRef(({
       <select
         id={id}
         ref={ref}
-        className={`w-full px-3.5 py-2 text-sm bg-white dark:bg-gray-950 border rounded-lg shadow-inner outline-none transition-all duration-150 appearance-none
+        className={`w-full px-3.5 py-2.5 text-sm bg-white/90 dark:bg-slate-950/80 border rounded-xl outline-none transition-all duration-200 appearance-none
           ${error 
             ? 'border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-200 dark:focus:ring-red-900/30' 
-            : 'border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:border-gray-800 dark:focus:border-indigo-500 dark:focus:ring-indigo-950/30'
+            : 'border-slate-200 hover:border-slate-300 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100/70 dark:border-slate-800 dark:focus:border-emerald-500 dark:focus:ring-emerald-950/30'
           } dark:text-gray-100`}
         style={{
           backgroundImage: `url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M7 9l3 3 3-3' stroke='%236B7280' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`,
