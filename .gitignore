@@ -55,3 +55,9 @@ Thumbs.db
 *.njsproj
 *.sln
 *.sw?
+
+# Internal planning docs
+agents.md
+task.md
+walkthrough.md
+implementation_plan.md
