@@ -104,7 +104,7 @@ The application seeds 5 pre-configured accounts (Password: **`password`**):
    ```bash
    npm run dev
    ```
-3. Open **`http://localhost:5173`** in your browser. Use the login selector cards to test each role's dashboard.
+3. Open **`http://localhost:5173`** in your browser. You can use the login cards to test multiple roles.
 
 ### 3. Add Your Gemini API Key
 To enable live AI query generation in the ChatGPT Copilot:
