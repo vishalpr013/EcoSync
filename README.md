@@ -128,6 +128,17 @@ EcoSync/
 
 ---
 
+### 2. Run the Frontend App
+1. Navigate to the frontend directory:
+   ```bash
+   cd frontend
+   ```
+2. Start the Vite server:
+   ```bash
+   npm run dev
+   ```
+3. Open **`http://localhost:5173`** in your browser. You can use the login cards to test multiple roles.
+
 ## Getting Started
 
 ### Prerequisites
