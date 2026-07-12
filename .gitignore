@@ -1,0 +1,57 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+build/
+dist/
+dist-ssr/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Unit test / coverage reports
+.coverage
+.coverage.*
+.pytest_cache/
+.cache/
+
+# Environments and Secrets
+.env
+.venv/
+env/
+venv/
+ENV/
+*.local
+
+# Node / npm dependency directories
+node_modules/
+jspm_packages/
+
+# Project-specific SQLite databases
+backend/ecosync.db
+backend/ecosync.db-journal
+backend/ecosync.db-wal
+ecosync.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# IDE and Editors
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
