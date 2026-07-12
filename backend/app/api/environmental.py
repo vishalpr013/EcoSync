@@ -3,6 +3,7 @@ Environmental API routes: Emission Factors, Carbon Transactions, Products, Goals
 """
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 from typing import Optional
 from uuid import UUID
 from decimal import Decimal
@@ -15,7 +16,8 @@ from app.models.environmental import (
     EmissionFactor, CarbonTransaction, Product, ProductESGProfile,
     EnvironmentalGoal, GoalProgress,
 )
-from app.models.core import User
+from app.models.core import User, ESGConfiguration
+from app.core.exceptions import BadRequestError
 from app.schemas.common import PaginatedResponse, MessageResponse, IDResponse
 from app.repositories.base import BaseRepository
 
@@ -108,12 +110,23 @@ async def create_carbon_transaction(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(require_roles(UserRole.ADMIN, UserRole.ESG_MANAGER)),
 ):
-    # Auto-calculate emission if emission_factor_id provided
+    config_result = await db.execute(
+        select(ESGConfiguration).where(ESGConfiguration.key.in_(["auto_emission_calculation", "auto_emission"]))
+        .order_by(ESGConfiguration.key.desc()).limit(1)
+    )
+    config = config_result.scalar_one_or_none()
+    auto_enabled = not config or config.value.lower() == "true"
+
+    # Auto-calculate from the linked factor when enabled; otherwise require an explicit value.
     if "emission_factor_id" in data and "quantity" in data:
         ef_repo = BaseRepository(EmissionFactor, db)
         ef = await ef_repo.get_by_id(data["emission_factor_id"])
         if ef:
-            data["calculated_emission"] = float(Decimal(str(data["quantity"])) * ef.factor_value)
+            if auto_enabled:
+                data["calculated_emission"] = float(Decimal(str(data["quantity"])) * ef.factor_value)
+                data["is_auto_calculated"] = True
+            elif "calculated_emission" not in data:
+                raise BadRequestError("calculated_emission is required when automatic calculation is disabled")
     data["created_by"] = current_user.id
     repo = BaseRepository(CarbonTransaction, db)
     ct = await repo.create(**data)

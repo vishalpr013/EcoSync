@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { Input, Button } from '../components/ui/FormControls';
 import { Card } from '../components/ui/DataDisplay';
-import { Sparkles, ShieldAlert } from 'lucide-react';
+import { ArrowRight, Leaf, ShieldAlert, ShieldCheck, Sparkles } from 'lucide-react';
 
 const LoginPage = () => {
   const { login } = useAuth();
@@ -50,17 +50,40 @@ const LoginPage = () => {
   };
 
   return (
-    <Card className="shadow-2xl border border-gray-250/30 p-8 dark:bg-gray-950/80 backdrop-blur-md">
-      {/* Brand Header */}
-      <div className="flex flex-col items-center mb-6 text-center">
-        <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-600/30 mb-2">
-          E
+    <Card className="grid lg:grid-cols-[1.05fr_0.95fr] overflow-hidden p-0 shadow-[0_30px_80px_rgba(15,23,42,0.16)] border-white/70 dark:border-slate-800 dark:bg-slate-950/90 backdrop-blur-xl">
+      <section className="relative hidden lg:flex flex-col justify-between min-h-[650px] p-10 text-white bg-[#0d1b1b] overflow-hidden">
+        <div className="absolute inset-0 opacity-60" style={{ backgroundImage: 'radial-gradient(circle at 85% 12%, rgba(52,211,153,.22), transparent 28%), radial-gradient(circle at 10% 90%, rgba(59,130,246,.12), transparent 30%)' }} />
+        <div className="absolute inset-0 opacity-[0.06]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,.7) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.7) 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+        <div className="relative">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-emerald-400/15 border border-emerald-300/20 grid place-items-center text-emerald-300"><Leaf className="w-5 h-5" /></div>
+            <div><p className="font-bold tracking-[-0.03em] text-lg">EcoSync</p><p className="text-[9px] uppercase tracking-[0.22em] text-slate-400">ESG Intelligence Platform</p></div>
+          </div>
+          <div className="mt-16 max-w-md">
+            <span className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] font-semibold text-emerald-300"><span className="w-8 h-px bg-emerald-400/60" /> Built for measurable impact</span>
+            <h1 className="mt-5 text-[2.7rem] leading-[1.08] font-semibold tracking-[-0.045em] text-white">Turn sustainability data into decisions.</h1>
+            <p className="mt-5 text-sm leading-6 text-slate-400">A unified command center for carbon accounting, social impact, governance, and employee engagement.</p>
+          </div>
         </div>
-        <h2 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">
-          Welcome to EcoSync
+        <div className="relative grid grid-cols-3 gap-3">
+          {[['40%', 'Environmental'], ['30%', 'Social'], ['30%', 'Governance']].map(([value, label]) => (
+            <div key={label} className="rounded-xl border border-white/[0.08] bg-white/[0.04] p-3 backdrop-blur-sm"><p className="text-xl font-semibold text-white">{value}</p><p className="mt-1 text-[10px] text-slate-500">{label} weight</p></div>
+          ))}
+        </div>
+      </section>
+
+      <section className="p-7 sm:p-10 lg:p-12 flex flex-col justify-center">
+      {/* Brand Header */}
+      <div className="mb-8">
+        <div className="lg:hidden w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-lg shadow-emerald-600/20 mb-5">
+          <Leaf className="w-5 h-5" />
+        </div>
+        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-600 dark:text-emerald-400 mb-2">Secure workspace</p>
+        <h2 className="text-2xl sm:text-3xl font-bold tracking-[-0.035em] text-slate-950 dark:text-white">
+          Welcome back
         </h2>
-        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-          AI-Powered ESG Management Platform
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
+          Sign in to your organization’s ESG command center.
         </p>
       </div>
 
@@ -92,33 +115,35 @@ const LoginPage = () => {
         <Button
           type="submit"
           variant="primary"
-          className="w-full py-2.5 font-bold"
+          className="w-full py-3 font-bold gap-2"
           loading={loading}
         >
-          Sign In
+          Sign In <ArrowRight className="w-4 h-4" />
         </Button>
       </form>
 
       {/* Demo Account quick-select panel */}
-      <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-850">
-        <div className="flex items-center gap-1.5 mb-3 text-indigo-600 dark:text-indigo-400">
-          <Sparkles className="w-3.5 h-3.5" />
-          <span className="text-xs font-bold uppercase tracking-wider">Quick Demo Login</span>
+      <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400"><Sparkles className="w-3.5 h-3.5" /><span className="text-[10px] font-bold uppercase tracking-[0.15em]">Demo workspaces</span></div>
+          <span className="text-[10px] text-slate-400">Password prefilled</span>
         </div>
-        <div className="grid grid-cols-1 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {demoAccounts.map((account) => (
             <button
               key={account.email}
               type="button"
               onClick={() => handleDemoSelect(account.email)}
-              className="w-full flex items-center justify-between px-3.5 py-2 text-xs font-medium text-gray-650 bg-gray-50 hover:bg-indigo-50/40 hover:text-indigo-700 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-indigo-950/20 dark:hover:text-indigo-400 rounded-lg transition-colors border border-transparent hover:border-indigo-100 dark:hover:border-indigo-950"
+              className="group w-full flex items-center justify-between px-3 py-2.5 text-xs font-medium text-slate-600 bg-slate-50/80 hover:bg-emerald-50/70 hover:text-emerald-800 dark:bg-slate-900/70 dark:text-slate-400 dark:hover:bg-emerald-950/20 dark:hover:text-emerald-300 rounded-xl transition-all duration-200 border border-slate-200/70 hover:border-emerald-200 dark:border-slate-800 dark:hover:border-emerald-900 active:scale-[0.98]"
             >
               <span>{account.label}</span>
-              <span className="text-[10px] text-gray-400 font-semibold">{account.role}</span>
+              <span className="text-[9px] text-slate-400 group-hover:text-emerald-500 font-semibold">{account.role}</span>
             </button>
           ))}
         </div>
       </div>
+      <div className="mt-6 flex items-center gap-2 text-[10px] text-slate-400"><ShieldCheck className="w-3.5 h-3.5 text-emerald-500" /> JWT secured · Role-based access · Audit logged</div>
+      </section>
     </Card>
   );
 };

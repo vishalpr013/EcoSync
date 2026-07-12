@@ -1,18 +1,20 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import MainLayout from '../layouts/MainLayout';
 import AuthLayout from '../layouts/AuthLayout';
-import LoginPage from '../pages/LoginPage';
-import DashboardPage from '../pages/DashboardPage';
-import EnvironmentalPage from '../pages/EnvironmentalPage';
-import SocialPage from '../pages/SocialPage';
-import GovernancePage from '../pages/GovernancePage';
-import GamificationPage from '../pages/GamificationPage';
-import AICopilotPage from '../pages/AICopilotPage';
-import ReportsPage from '../pages/ReportsPage';
-import AdminPage from '../pages/AdminPage';
-import NotFoundPage from '../pages/NotFoundPage';
+import { Loader } from '../components/ui/Overlays';
+
+const LoginPage = lazy(() => import('../pages/LoginPage'));
+const DashboardPage = lazy(() => import('../pages/DashboardPage'));
+const EnvironmentalPage = lazy(() => import('../pages/EnvironmentalPage'));
+const SocialPage = lazy(() => import('../pages/SocialPage'));
+const GovernancePage = lazy(() => import('../pages/GovernancePage'));
+const GamificationPage = lazy(() => import('../pages/GamificationPage'));
+const AICopilotPage = lazy(() => import('../pages/AICopilotPage'));
+const ReportsPage = lazy(() => import('../pages/ReportsPage'));
+const AdminPage = lazy(() => import('../pages/AdminPage'));
+const NotFoundPage = lazy(() => import('../pages/NotFoundPage'));
 
 // Component to protect routes based on login and user roles
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -37,6 +39,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
 const AppRouter = () => {
   return (
     <BrowserRouter>
+      <Suspense fallback={<div className="min-h-screen grid place-items-center bg-gray-50 dark:bg-gray-950"><Loader /></div>}>
       <Routes>
         {/* Public/Auth Routes */}
         <Route element={<AuthLayout />}>
@@ -115,6 +118,7 @@ const AppRouter = () => {
           <Route path="*" element={<Navigate to="/404" replace />} />
         </Route>
       </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 };

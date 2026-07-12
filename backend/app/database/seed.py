@@ -25,7 +25,7 @@ async def seed_db():
             ESGConfiguration(key="env_weight", value="40", description="Environmental score percentage weight"),
             ESGConfiguration(key="social_weight", value="30", description="Social score percentage weight"),
             ESGConfiguration(key="governance_weight", value="30", description="Governance score percentage weight"),
-            ESGConfiguration(key="auto_emission", value="true", description="Automatically compute carbon footprint"),
+            ESGConfiguration(key="auto_emission_calculation", value="true", description="Automatically compute carbon footprint"),
             ESGConfiguration(key="evidence_required", value="true", description="Enforce evidence upload constraint"),
             ESGConfiguration(key="badge_auto_award", value="true", description="Auto award badges on XP threshold check"),
         ]
@@ -105,7 +105,8 @@ async def seed_db():
         session.add(challenge1)
 
         # 11. Department Scores
-        score1 = DepartmentScore(department_id=depts["mfg"].id, environmental_score=89.0, social_score=80.5, governance_score=85.0, total_score=85.2, period=date(2026, 6, 30))
+        # Weighted ESG score: (92 × 40%) + (88 × 30%) + (89.33 × 30%) = 90.00
+        score1 = DepartmentScore(department_id=depts["mfg"].id, environmental_score=92.0, social_score=88.0, governance_score=89.33, total_score=90.0, period=date(2026, 6, 30))
         session.add(score1)
 
         await session.commit()

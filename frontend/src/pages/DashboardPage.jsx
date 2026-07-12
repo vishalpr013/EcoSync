@@ -23,6 +23,7 @@ import {
   AlertTriangle,
   History,
   ArrowUpRight,
+  Target,
 } from 'lucide-react';
 import { formatNumber, formatDate } from '../utils/helpers';
 
@@ -40,8 +41,19 @@ const DashboardPage = () => {
     setLoading(true);
     try {
       if (user.role === 'admin' || user.role === 'esg_manager') {
-        const res = await dashboardService.getOverviewDashboard();
-        setData(res);
+        const [overview, environmental, recentActivity] = await Promise.all([
+          dashboardService.getOverviewDashboard(),
+          dashboardService.getEnvironmentalDashboard(),
+          dashboardService.getRecentActivity(),
+        ]);
+        setData({
+          ...overview,
+          emissions_timeline: environmental.emissions_timeline || [],
+          recent_activity: (recentActivity || []).map((item) => ({
+            ...item,
+            time: item.timestamp ? formatDate(item.timestamp) : 'Recently',
+          })),
+        });
       } else if (user.role === 'department_head') {
         // Fallback or fetch department dashboard
         const res = await dashboardService.getDepartmentDashboard(user.department_id || 'default');
@@ -69,7 +81,7 @@ const DashboardPage = () => {
     // Elegant high-fidelity mock data to make sure the app displays beautifully
     if (user.role === 'admin' || user.role === 'esg_manager') {
       setData({
-        esg_score: { overall: 78.4, environmental: 82.0, social: 75.5, governance: 77.0, weights: { environmental: 40, social: 30, governance: 30 } },
+        esg_score: { overall: 90.0, environmental: 92.0, social: 88.0, governance: 89.33, grade: 'A', band: 'ESG Leader', next_target: 100, points_to_next_band: 10, weights: { environmental: 40, social: 30, governance: 30 } },
         metrics: { total_carbon_emissions: 14250.6, total_csr_participations: 84, compliance_issues: { total: 12, open: 3 } },
         department_rankings: [
           { department_name: 'Manufacturing', score: 85.2 },
@@ -96,7 +108,7 @@ const DashboardPage = () => {
     } else if (user.role === 'department_head') {
       setData({
         department_name: 'Manufacturing',
-        esg_score: { overall: 85.2, environmental: 89.0, social: 80.5, governance: 85.0 },
+        esg_score: { overall: 90.0, environmental: 92.0, social: 88.0, governance: 89.33 },
         metrics: { carbon_emissions: 8450.2, csr_participations: 42, active_challenges: 3, open_issues: 1 },
         emissions_timeline: [
           { date: 'Jan', emissions: 1500 },
@@ -184,7 +196,7 @@ const DashboardPage = () => {
     return (
       <div className="space-y-6">
         {/* Welcome Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white leading-none">
               ESG Command Center
@@ -193,7 +205,7 @@ const DashboardPage = () => {
               Real-time sustainability metrics, carbon accounting, and governance tracking.
             </p>
           </div>
-          <Badge color="indigo" className="py-1 px-3">
+          <Badge color="indigo" className="py-1 px-3 shrink-0">
             Active Weights: Env {data.esg_score.weights.environmental}%, Soc {data.esg_score.weights.social}%, Gov {data.esg_score.weights.governance}%
           </Badge>
         </div>
@@ -243,6 +255,42 @@ const DashboardPage = () => {
             </div>
           </Card>
         </div>
+
+        {/* Explainable score improvement plan */}
+        <Card className="relative overflow-hidden border-emerald-200/60 dark:border-emerald-900/40">
+          <div className="absolute -right-20 -top-24 w-64 h-64 rounded-full bg-emerald-400/[0.07] blur-3xl pointer-events-none" />
+          <div className="relative flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
+            <div className="max-w-md">
+              <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
+                <Target className="w-4 h-4" />
+                <span className="text-[10px] font-bold uppercase tracking-[0.16em]">Score improvement plan</span>
+              </div>
+              <div className="mt-3 flex items-end gap-3">
+                <span className="text-4xl font-black tracking-[-0.04em] text-slate-950 dark:text-white">{data.projected_score ?? data.esg_score.overall}</span>
+                <span className="mb-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400">projected score</span>
+              </div>
+              <p className="mt-2 text-xs leading-5 text-slate-500 dark:text-slate-400">
+                Current rating <strong className="text-slate-700 dark:text-slate-200">{data.esg_score.grade || 'B'} · {data.esg_score.band || 'Advanced'}</strong>. {data.esg_score.points_to_next_band ?? 0} points to the next band.
+              </p>
+              <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+                <div className="h-full rounded-full bg-emerald-500 transition-[width] duration-1000 ease-out" style={{ width: `${Math.min(100, data.esg_score.overall)}%` }} />
+              </div>
+            </div>
+            <div className="grid flex-1 gap-3 md:grid-cols-3 xl:max-w-3xl">
+              {(data.improvement_plan || []).map((item) => (
+                <a key={item.pillar} href={item.route} className="group rounded-xl border border-slate-200/80 bg-slate-50/60 p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-emerald-300 hover:bg-emerald-50/40 dark:border-slate-800 dark:bg-slate-900/50 dark:hover:border-emerald-800 dark:hover:bg-emerald-950/10">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-400">Priority {item.priority}</span>
+                    <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400">+{item.projected_overall_impact} pts</span>
+                  </div>
+                  <h4 className="mt-2 text-sm font-bold text-slate-800 dark:text-slate-100">{item.title}</h4>
+                  <p className="mt-1.5 text-[11px] leading-4 text-slate-500 dark:text-slate-400 line-clamp-3">{item.action}</p>
+                  <div className="mt-3 flex items-center gap-1 text-[10px] font-semibold text-slate-500 group-hover:text-emerald-600 dark:group-hover:text-emerald-400">Open {item.pillar} module <ArrowUpRight className="w-3 h-3" /></div>
+                </a>
+              ))}
+            </div>
+          </div>
+        </Card>
 
         {/* Charts Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">

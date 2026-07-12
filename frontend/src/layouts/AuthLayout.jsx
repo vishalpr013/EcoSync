@@ -16,8 +16,10 @@ const AuthLayout = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50/50 dark:bg-gray-950 p-4 transition-colors">
-      <div className="w-full max-w-md animate-in fade-in zoom-in-95 duration-200">
+    <div className="app-canvas relative min-h-screen flex items-center justify-center p-4 sm:p-8 transition-colors overflow-hidden">
+      <div className="absolute -top-32 -right-24 w-96 h-96 rounded-full bg-emerald-300/10 blur-3xl soft-float" />
+      <div className="absolute -bottom-40 -left-24 w-[28rem] h-[28rem] rounded-full bg-blue-300/10 blur-3xl soft-float" style={{ animationDelay: '-3s' }} />
+      <div className="relative w-full max-w-5xl page-enter">
         <Outlet />
       </div>
     </div>

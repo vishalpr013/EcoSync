@@ -18,7 +18,7 @@ const MainLayout = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-250">
+    <div className="app-canvas min-h-screen text-slate-900 dark:text-slate-100 transition-colors duration-300">
       {/* Sidebar Navigation */}
       <Sidebar 
         collapsed={sidebarCollapsed} 
@@ -26,15 +26,15 @@ const MainLayout = () => {
       />
 
       {/* Topbar and Content panel */}
-      <div className={`transition-all duration-200 min-h-screen flex flex-col ${sidebarCollapsed ? 'pl-16' : 'pl-64'}`}>
+      <div className={`transition-[padding] duration-300 min-h-screen flex flex-col ${sidebarCollapsed ? 'lg:pl-[4.5rem]' : 'lg:pl-[15.5rem]'}`}>
         <Topbar 
           collapsed={sidebarCollapsed} 
           toggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)} 
         />
         
         {/* Main Content Area */}
-        <main className="flex-1 pt-24 pb-8 px-6 max-w-7xl w-full mx-auto">
-          <Outlet />
+        <main className="flex-1 pt-24 pb-28 lg:pb-10 px-4 sm:px-6 lg:px-8 max-w-[90rem] w-full mx-auto">
+          <div className="page-enter"><Outlet /></div>
         </main>
       </div>
     </div>
